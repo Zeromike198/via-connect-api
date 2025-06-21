@@ -11,7 +11,7 @@ export class AppService {
       const connection = await conn();
 
       const [row] = await connection.query<ResultSetHeader[]>(
-        'SELECT name FROM user',
+        'SELECT COUNT(*) as totalUser FROM user',
       );
 
       return res.json({ response: row.length });

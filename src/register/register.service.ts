@@ -40,15 +40,16 @@ export class RegisterService {
           .json({ response: 'El correo electrónico ya está registrado' });
 
       const passwordHash = bcrypt.hashSync(password, 10);
+      const randomImage = await fetch('https://picsum.photos/200/300');
 
-      await connection.query(
-        'INSERT INTO user(name, lastName, email, role, password) VALUES (?, ?, ?, ?, ?)',
-        [name, lastName, email, role, passwordHash],
+      const row2 = await connection.query<ResultSetHeader>(
+        'INSERT INTO user(name, lastName, email, image, role, password) VALUES (?, ?, ?, ?, ?, ?)',
+        [name, lastName, email, randomImage.url, role, passwordHash],
       );
 
       await connection.end();
 
-      return res.status(200).json({ response: 'success' });
+      return res.status(200).json({ response: row2[0].insertId });
     } catch (err) {
       return handleError(res, err);
     }
