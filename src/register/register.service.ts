@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import * as bcrypt from 'bcryptjs';
 import { ResultSetHeader } from 'mysql2/promise';
 import { Injectable } from '@nestjs/common';
@@ -12,6 +11,7 @@ import {
   roleSchema,
 } from './register.schema';
 import { conn } from 'src/models/mysqlConnection';
+import { handleError } from 'src/utils/handleError';
 
 @Injectable()
 export class RegisterService {
@@ -37,7 +37,7 @@ export class RegisterService {
       if (row.length > 0)
         return res
           .status(400)
-          .json({ message: 'El correo electrónico ya está registrado' });
+          .json({ response: 'El correo electrónico ya está registrado' });
 
       const passwordHash = bcrypt.hashSync(password, 10);
 
@@ -46,15 +46,11 @@ export class RegisterService {
         [name, lastName, email, role, passwordHash],
       );
 
-      return res.status(200).json({ message: 'success' });
+      await connection.end();
+
+      return res.status(200).json({ response: 'success' });
     } catch (err) {
-      console.log(err);
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ response: err.errors[0].message });
-      }
-      return res
-        .status(500)
-        .json({ response: 'Ha ocurrido un error en el servidor' });
+      return handleError(res, err);
     }
   }
 }
