@@ -13,6 +13,7 @@ export class AppService {
       const [row] = await connection.query<ResultSetHeader[]>(
         'SELECT COUNT(*) as totalUser FROM user',
       );
+      await connection.end();
 
       return res.json({ response: row.length });
     } catch (err) {

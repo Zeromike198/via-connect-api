@@ -15,6 +15,8 @@ export class UserService {
         [userID],
       );
 
+      await connection.end();
+
       if (row.length === 0)
         return res.status(400).json({ response: 'El usuario no existe' });
 

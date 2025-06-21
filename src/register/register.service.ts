@@ -34,10 +34,12 @@ export class RegisterService {
         [email],
       );
 
-      if (row.length > 0)
+      if (row.length > 0) {
+        await connection.end();
         return res
           .status(400)
           .json({ response: 'El correo electrónico ya está registrado' });
+      }
 
       const passwordHash = bcrypt.hashSync(password, 10);
       const randomImage = await fetch('https://picsum.photos/200/300');
