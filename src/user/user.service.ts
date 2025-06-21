@@ -18,7 +18,7 @@ export class UserService {
       if (row.length === 0)
         return res.status(400).json({ response: 'El usuario no existe' });
 
-      return res.json(row[0]);
+      return res.json({ user: row[0] });
     } catch (err) {
       return handleError(res, err);
     }
