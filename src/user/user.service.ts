@@ -4,6 +4,11 @@ import { ResultSetHeader } from 'mysql2';
 import { conn } from 'src/models/mysqlConnection';
 import { handleError } from 'src/utils/handleError';
 import { ProfileUserDto } from './user.dto';
+import {
+  emailSchema,
+  lastNameSchema,
+  nameSchema,
+} from 'src/register/register.schema';
 
 @Injectable()
 export class UserService {
@@ -38,16 +43,21 @@ export class UserService {
 
       if (row.length === 0) {
         await connection.end();
-
         return res.status(400).json({ response: 'El usuario no existe' });
       }
 
       const { name, lastName, email, image } = user;
 
+      //format with zod
+      await nameSchema.parseAsync(name);
+      await lastNameSchema.parseAsync(lastName);
+      await emailSchema.parseAsync(email);
+
       await connection.execute(
         'UPDATE user SET name = ?, lastName = ?, email = ?, image = ?',
         [name, lastName, email, image],
       );
+
       await connection.end();
 
       return res.json({ response: 'success' });
