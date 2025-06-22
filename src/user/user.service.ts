@@ -54,18 +54,20 @@ export class UserService {
       await emailSchema.parseAsync(email);
 
       const [row2] = await connection.execute<RowDataPacket[]>(
-        'SELECT COUNT(*) FROM user WHERE userID <> ? AND email = ?',
+        'SELECT COUNT(*) as email FROM user WHERE userID != ? AND email = ?',
         [userID, email],
       );
 
-      if (row2.length > 0) {
+      const emailRepeat = row2[0].email as number;
+
+      if (emailRepeat > 0) {
         await connection.end();
         return res.status(400).json({ response: '¡El correo ya existe!' });
       }
 
       await connection.execute(
-        'UPDATE user SET name = ?, lastName = ?, email = ?, image = ?',
-        [name, lastName, email, image],
+        'UPDATE user SET name = ?, lastName = ?, email = ?, image = ? WHERE userID = ?',
+        [name, lastName, email, image, userID],
       );
 
       await connection.end();
